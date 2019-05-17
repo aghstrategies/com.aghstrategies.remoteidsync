@@ -3,6 +3,32 @@
 require_once 'remoteidsync.civix.php';
 use CRM_Remoteidsync_ExtensionUtil as E;
 
+function remoteidsync_civicrm_custom($op, $groupID, $entityID, &$params) {
+  if ($op == 'create' || $op == 'edit') {
+    if ($groupID == 7) {
+      foreach ($params as $key => $values) {
+        if ($values['custom_field_id'] == 13) {
+          $contactIdInOtherDB = $values['value'];
+          $contactIdInThisDB = $entityID;
+          $settings = CRM_Remoteidsync_Form_Settings::getSettings([]);
+          $apiCall = "entity=Contact&action=create&api_key={$settings['remoteidsync_apikey']}&key={$settings['remoteidsync_sitekey']}&json={'id':$contactIdInOtherDB, 'custom_13':$contactIdInThisDB}";
+          $ch = curl_init();
+          curl_setopt($ch, CURLOPT_URL, 'http://d514.localhost/sites/all/modules/civicrm/extern/rest.php');
+          curl_setopt($ch, CURLOPT_POST, 1);
+          curl_setopt($ch, CURLOPT_POSTFIELDS, $apiCall);
+
+          $result = curl_exec($ch);
+          $ob = json_decode($result);
+          curl_close($ch);
+          print_r($result);
+          print_r($ob); die();
+          CRM_Core_Session::setStatus(ts('Remote ID synced'), ts('Remote ID'), 'success');
+        }
+      }
+    }
+  }
+}
+
 /**
  * Implements hook_civicrm_config().
  *

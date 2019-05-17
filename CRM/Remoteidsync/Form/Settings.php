@@ -29,7 +29,7 @@ class CRM_Remoteidsync_Form_Settings extends CRM_Core_Form {
     // export form elements
     $this->assign('elementNames', $this->getRenderableElementNames());
 
-    $defaults = self::getDefaults($settingFields);
+    $defaults = self::getSettings($settingFields);
     $this->setDefaults($defaults);
 
     parent::buildQuickForm();
@@ -40,8 +40,12 @@ class CRM_Remoteidsync_Form_Settings extends CRM_Core_Form {
    * @param  array $settingFields  settings fields
    * @return array                 default values
    */
-  public function getDefaults($settingFields) {
+  public function getSettings($settingFields = []) {
     $defaults = array();
+
+    if ($settingFields == []) {
+      $settingFields = self::settingsFields();
+    }
     try {
       $existingSetting = civicrm_api3('Setting', 'get', array(
         'sequential' => 1,
