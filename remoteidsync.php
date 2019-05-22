@@ -5,7 +5,7 @@ use CRM_Remoteidsync_ExtensionUtil as E;
 use GuzzleHttp\Client;
 
 /**
- * Check if file exists on given URL.
+ * Rest API Call using guzzle
  *
  * @param string $url
  * @param float $timeout
@@ -28,7 +28,36 @@ function apiCall($url, $timeout = 0.50) {
   return $fileExists;
 }
 
-function remoteidsync_civicrm_custom($op, $groupID, $entityID, &$params) {
+function remoteidsync_civicrm_summary($contactID, &$content, &$contentPlacement) {
+  $remoteID = NULL;
+  $contentPlacement = CRM_Utils_Hook::SUMMARY_ABOVE;
+  $settings = CRM_Remoteidsync_Form_Settings::getSettings([]);
+  try {
+    $remoteIDCall = civicrm_api3('Contact', 'getsingle', array(
+      'id' => $contactID,
+      'return' => 'custom_13',
+      'sequential' => 1,
+    ));
+  }
+  catch (CiviCRM_API3_Exception $e) {
+    $error = $e->getMessage();
+    CRM_Core_Error::debug_log_message(ts('API Error %1', array(
+      'domain' => 'com.aghstrategies.remoteidsync',
+      1 => $error,
+    )));
+  }
+  if (!empty($remoteIDCall['custom_13'])) {
+    $remoteID = $remoteIDCall['custom_13'];
+  }
+  // TODO abstract out url
+  $content = "<div>
+    <div class='crm-label'>
+      Remote ID: <a href='http://d514.localhost/civicrm/contact/view?reset=1&cid={$remoteID}'>$remoteID</a>
+    </div>
+  </div>";
+}
+
+function remoteidsync_civicrm_custom($op, $groupID, $entityID, $params) {
   if ($op == 'create' || $op == 'edit') {
     if ($groupID == 7) {
       foreach ($params as $key => $values) {
