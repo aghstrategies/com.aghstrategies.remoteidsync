@@ -1,44 +1,16 @@
 # com.aghstrategies.remoteidsync
 
-![Screenshot](/images/screenshot.png)
+This extension creates a remote id field.
 
-(*FIXME: In one or two paragraphs, describe what the extension does and why one would download it. *)
+If two civicrm instances have this extension installed with the settings configured the Remote ID field created by this extension will be linked to the remote id field in the site it is configured to talk to.
 
-The extension is licensed under [AGPL-3.0](LICENSE.txt).
+If a remote id is deleted the other site will be updated.
+If a remote id is changed the other site will be updated.
 
-## Requirements
+Example settings for drupal ({site}//civicrm/remoteidsync/settings):
+Endpoint for API: http://d514.localhost/sites/all/modules/civicrm/extern/rest.php
+Base URL: http://d514.localhost/civicrm/contact/view?reset=1&cid=
 
-* PHP v5.6+
-* CiviCRM (*FIXME: Version number*)
-
-## Installation (Web UI)
-
-This extension has not yet been published for installation via the web UI.
-
-## Installation (CLI, Zip)
-
-Sysadmins and developers may download the `.zip` file for this extension and
-install it with the command-line tool [cv](https://github.com/civicrm/cv).
-
-```bash
-cd <extension-dir>
-cv dl com.aghstrategies.remoteidsync@https://github.com/FIXME/com.aghstrategies.remoteidsync/archive/master.zip
-```
-
-## Installation (CLI, Git)
-
-Sysadmins and developers may clone the [Git](https://en.wikipedia.org/wiki/Git) repo for this extension and
-install it with the command-line tool [cv](https://github.com/civicrm/cv).
-
-```bash
-git clone https://github.com/FIXME/com.aghstrategies.remoteidsync.git
-cv en remoteidsync
-```
-
-## Usage
-
-(* FIXME: Where would a new user navigate to get started? What changes would they see? *)
-
-## Known Issues
-
-(* FIXME *)
+Example settings for wordpress ({site}/wp-admin/admin.php?page=CiviCRM&q=civicrm%2Fremoteidsync%2Fsettings):
+Endpoint for API: http://wp5.localhost/wp-content/plugins/civicrm/civicrm/extern/rest.php
+Base URL: http://wp5.localhost/wp-admin/admin.php?page=CiviCRM&q=civicrm%2Fcontact%2Fview&cid=
