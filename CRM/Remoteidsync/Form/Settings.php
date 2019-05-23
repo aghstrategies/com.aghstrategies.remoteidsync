@@ -10,7 +10,10 @@ use CRM_Remoteidsync_ExtensionUtil as E;
 class CRM_Remoteidsync_Form_Settings extends CRM_Core_Form {
 
   public function getCustomFieldForThisDB() {
-    $customFieldId = NULL;
+    $customFieldInfo = [
+      'custom_field_id' => NULL,
+      'custom_group_id' => NULL,
+    ];
     try {
       $customField = civicrm_api3('CustomGroup', 'getsingle', [
         'name' => "Remote_ID",
@@ -21,10 +24,11 @@ class CRM_Remoteidsync_Form_Settings extends CRM_Core_Form {
       $error = $e->getMessage();
       CRM_Core_Error::debug_log_message(ts('API Error: %1', array(1 => $error, 'domain' => 'com.aghstrategies.remoteidsync')));
     }
-    if (!empty($customField["api.CustomField.getsingle"]['id'])) {
-      $customFieldId = $customField["api.CustomField.getsingle"]['id'];
+    if (!empty($customField["api.CustomField.getsingle"]['id']) && !empty($customField['id'])) {
+      $customFieldInfo['custom_field_id'] = $customField["api.CustomField.getsingle"]['id'];
+      $customFieldInfo['custom_group_id'] = $customField['id'];
     }
-    return $customFieldId;
+    return $customFieldInfo;
   }
 
   public function buildQuickForm() {
@@ -47,7 +51,9 @@ class CRM_Remoteidsync_Form_Settings extends CRM_Core_Form {
     // export form elements
     $this->assign('elementNames', $this->getRenderableElementNames());
     $customField = self::getCustomFieldForThisDB();
-    $this->assign('customField', $customField);
+    if (!empty( $customField['custom_field_id'])) {
+      $this->assign('customField', $customField['custom_field_id']);
+    }
     $defaults = self::getSettings($settingFields);
     $this->setDefaults($defaults);
 

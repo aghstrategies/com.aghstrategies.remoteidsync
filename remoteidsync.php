@@ -65,8 +65,12 @@ function remoteidsync_civicrm_custom($op, $groupID, $entityID, $params) {
   if ($op == 'create' || $op == 'edit') {
     $customFieldInThisDB = CRM_Remoteidsync_Form_Settings::getCustomFieldForThisDB();
     $settings = CRM_Remoteidsync_Form_Settings::getSettings([]);
-    if (!empty($settings['remoteidsync_customfield']) && !empty($customFieldInThisDB)) {
+    if (!empty($settings['remoteidsync_customfield'])
+    && !empty($customFieldInThisDB['custom_group_id'])
+    && !empty($customFieldInThisDB['custom_field_id'])
+    && $groupID == $customFieldInThisDB['custom_group_id']) {
       foreach ($params as $key => $values) {
+        print_r($params); die();
         if (!empty($values['value']) && $values['custom_field_id'] == $customFieldInThisDB) {
           $contactIdInOtherDB = $values['value'];
           $contactIdInThisDB = $entityID;
