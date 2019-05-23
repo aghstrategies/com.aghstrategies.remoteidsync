@@ -3,7 +3,6 @@
 <div class="crm-submit-buttons">
 {include file="CRM/common/formButtons.tpl" location="top"}
 </div>
-
 {* FIELD EXAMPLE: OPTION 1 (AUTOMATIC LAYOUT) *}
 
 {foreach from=$elementNames item=elementName}
@@ -13,7 +12,9 @@
     <div class="clear"></div>
   </div>
 {/foreach}
-
+<div class="messages status no-popup">
+  NOTE: the Custom Field ID on the other site should be: {$customField}
+</div>
 {* FIELD EXAMPLE: OPTION 2 (MANUAL LAYOUT)
 
   <div>
