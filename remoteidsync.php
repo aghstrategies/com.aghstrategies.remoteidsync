@@ -101,6 +101,7 @@ function remoteidsync_civicrm_custom($op, $groupID, $entityID, $params) {
             elseif ($checkIfWeNeedToUpdate->count == 0) {
               $apiCall = "{$settings['remoteidsync_apiendpoint']}?entity=Contact&action=create&api_key={$settings['remoteidsync_apikey']}&key={$settings['remoteidsync_sitekey']}&json=1&id={$contactIdInOtherDB}&custom_{$settings['remoteidsync_customfield']}={$contactIdInThisDB}";
               $result = apiCall($apiCall);
+              $check = checkForContactInOtherDB($settings, $contactIdInThisDB);
               // check that the sync worked and show success or error message
               if ($check->count == 1 && $check->id == $contactIdInOtherDB) {
                 CRM_Core_Session::setStatus(ts('Remote ID synced'), ts('Remote ID'), 'success');
