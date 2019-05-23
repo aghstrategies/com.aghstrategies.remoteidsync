@@ -32,40 +32,43 @@ function remoteidsync_civicrm_summary($contactID, &$content, &$contentPlacement)
   $remoteID = NULL;
   $contentPlacement = CRM_Utils_Hook::SUMMARY_ABOVE;
   $settings = CRM_Remoteidsync_Form_Settings::getSettings([]);
-  try {
-    $remoteIDCall = civicrm_api3('Contact', 'getsingle', array(
-      'id' => $contactID,
-      'return' => 'custom_13',
-      'sequential' => 1,
-    ));
+  if (!empty($settings['remoteidsync_customfield']) && !empty($settings['remoteidsync_baseurl'])) {
+    $customField = 'custom_' . $settings['remoteidsync_customfield'];
+    try {
+      $remoteIDCall = civicrm_api3('Contact', 'getsingle', array(
+        'id' => $contactID,
+        'return' => $customField,
+        'sequential' => 1,
+      ));
+    }
+    catch (CiviCRM_API3_Exception $e) {
+      $error = $e->getMessage();
+      CRM_Core_Error::debug_log_message(ts('API Error %1', array(
+        'domain' => 'com.aghstrategies.remoteidsync',
+        1 => $error,
+      )));
+    }
+    if (!empty($remoteIDCall[$customField])) {
+      $remoteID = $remoteIDCall[$customField];
+    }
+    // TODO abstract out url
+    $content = "<div>
+      <div class='crm-label'>
+        Remote ID: <a href='{$settings['remoteidsync_baseurl']}/civicrm/contact/view?reset=1&cid={$remoteID}'>$remoteID</a>
+      </div>
+    </div>";
   }
-  catch (CiviCRM_API3_Exception $e) {
-    $error = $e->getMessage();
-    CRM_Core_Error::debug_log_message(ts('API Error %1', array(
-      'domain' => 'com.aghstrategies.remoteidsync',
-      1 => $error,
-    )));
-  }
-  if (!empty($remoteIDCall['custom_13'])) {
-    $remoteID = $remoteIDCall['custom_13'];
-  }
-  // TODO abstract out url
-  $content = "<div>
-    <div class='crm-label'>
-      Remote ID: <a href='http://d514.localhost/civicrm/contact/view?reset=1&cid={$remoteID}'>$remoteID</a>
-    </div>
-  </div>";
 }
 
 function remoteidsync_civicrm_custom($op, $groupID, $entityID, $params) {
   if ($op == 'create' || $op == 'edit') {
-    if ($groupID == 7) {
+    $settings = CRM_Remoteidsync_Form_Settings::getSettings([]);
+    if (!empty($settings['remoteidsync_customfield'])) {
       foreach ($params as $key => $values) {
-        if (!empty($values['value']) && $values['custom_field_id'] == 13 && $values['custom_group_id'] == 7) {
+        if (!empty($values['value']) && $values['custom_field_id'] == $settings['remoteidsync_customfield']) {
           $contactIdInOtherDB = $values['value'];
           $contactIdInThisDB = $entityID;
-          $settings = CRM_Remoteidsync_Form_Settings::getSettings([]);
-          $apiCall = "{$settings['remoteidsync_apiendpoint']}?entity=Contact&action=create&api_key={$settings['remoteidsync_apikey']}&key={$settings['remoteidsync_sitekey']}&json=1&id={$contactIdInThisDB}&custom_13={$contactIdInOtherDB}";
+          $apiCall = "{$settings['remoteidsync_apiendpoint']}?entity=Contact&action=create&api_key={$settings['remoteidsync_apikey']}&key={$settings['remoteidsync_sitekey']}&json=1&id={$contactIdInThisDB}&custom_{$settings['remoteidsync_customfield']}={$contactIdInOtherDB}";
           $result = apiCall($apiCall);
           if ($result) {
             CRM_Core_Session::setStatus(ts('Remote ID synced'), ts('Remote ID'), 'success');

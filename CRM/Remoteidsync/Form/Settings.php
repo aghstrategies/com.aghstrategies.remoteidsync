@@ -61,6 +61,7 @@ class CRM_Remoteidsync_Form_Settings extends CRM_Core_Form {
         $defaults[$name] = $existingSetting['values'][0][$name];
       }
     }
+    // print_r($error); die();
     return $defaults;
   }
 
@@ -73,6 +74,8 @@ class CRM_Remoteidsync_Form_Settings extends CRM_Core_Form {
       'remoteidsync_sitekey' => 'Site Key',
       'remoteidsync_apikey' => 'API Key',
       'remoteidsync_apiendpoint' => 'Endpoint for API',
+      'remoteidsync_baseurl' => 'Base URL',
+      'remoteidsync_customfield' => 'Custom Field ID',
     ];
   }
 
