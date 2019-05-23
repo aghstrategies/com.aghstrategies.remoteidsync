@@ -54,7 +54,7 @@ function remoteidsync_civicrm_summary($contactID, &$content, &$contentPlacement)
     // TODO abstract out url
     $content = "<div>
       <div class='crm-label'>
-        Remote ID: <a href='{$settings['remoteidsync_baseurl']}civicrm/contact/view?reset=1&cid={$remoteID}'>$remoteID</a>
+        Remote ID: <a href='{$settings['remoteidsync_baseurl']}{$remoteID}'>$remoteID</a>
       </div>
     </div>";
   }
