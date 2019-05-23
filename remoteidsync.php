@@ -91,7 +91,7 @@ function remoteidsync_civicrm_custom($op, $groupID, $entityID, $params) {
             }
             // 1 match found and its up to date do nothing
             elseif ($checkIfWeNeedToUpdate->count == 1 && $checkIfWeNeedToUpdate->id == $contactIdInOtherDB) {
-              return;
+              exit;
             }
             // TODO deal with change
             elseif ($checkIfWeNeedToUpdate->count == 1 && $checkIfWeNeedToUpdate->id != $contactIdInOtherDB) {
