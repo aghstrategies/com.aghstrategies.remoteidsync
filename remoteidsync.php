@@ -70,7 +70,6 @@ function remoteidsync_civicrm_custom($op, $groupID, $entityID, $params) {
     && !empty($customFieldInThisDB['custom_field_id'])
     && $groupID == $customFieldInThisDB['custom_group_id']) {
       foreach ($params as $key => $values) {
-        print_r($params); die();
         if (!empty($values['value']) && $values['custom_field_id'] == $customFieldInThisDB) {
           $contactIdInOtherDB = $values['value'];
           $contactIdInThisDB = $entityID;

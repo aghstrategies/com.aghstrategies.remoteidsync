@@ -51,7 +51,7 @@ class CRM_Remoteidsync_Form_Settings extends CRM_Core_Form {
     // export form elements
     $this->assign('elementNames', $this->getRenderableElementNames());
     $customField = self::getCustomFieldForThisDB();
-    if (!empty( $customField['custom_field_id'])) {
+    if (!empty($customField['custom_field_id'])) {
       $this->assign('customField', $customField['custom_field_id']);
     }
     $defaults = self::getSettings($settingFields);
