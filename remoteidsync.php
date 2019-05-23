@@ -62,10 +62,11 @@ function remoteidsync_civicrm_summary($contactID, &$content, &$contentPlacement)
 
 function remoteidsync_civicrm_custom($op, $groupID, $entityID, $params) {
   if ($op == 'create' || $op == 'edit') {
+    $customFieldInThisDB = CRM_Remoteidsync_Form_Settings::getCustomFieldForThisDB();
     $settings = CRM_Remoteidsync_Form_Settings::getSettings([]);
-    if (!empty($settings['remoteidsync_customfield'])) {
+    if (!empty($settings['remoteidsync_customfield']) && !empty($customFieldInThisDB)) {
       foreach ($params as $key => $values) {
-        if (!empty($values['value']) && $values['custom_field_id'] == $settings['remoteidsync_customfield']) {
+        if (!empty($values['value']) && $values['custom_field_id'] == $customFieldInThisDB) {
           $contactIdInOtherDB = $values['value'];
           $contactIdInThisDB = $entityID;
           $apiCall = "{$settings['remoteidsync_apiendpoint']}?entity=Contact&action=create&api_key={$settings['remoteidsync_apikey']}&key={$settings['remoteidsync_sitekey']}&json=1&id={$contactIdInOtherDB}&custom_{$settings['remoteidsync_customfield']}={$contactIdInThisDB}";
