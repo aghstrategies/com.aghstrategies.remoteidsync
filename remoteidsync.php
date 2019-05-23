@@ -28,37 +28,15 @@ function apiCall($url, $timeout = 0.50) {
   return $fileExists;
 }
 
-function remoteidsync_civicrm_summary($contactID, &$content, &$contentPlacement) {
-  $remoteID = NULL;
-  $customFieldInThisDB = CRM_Remoteidsync_Form_Settings::getCustomFieldForThisDB();
-  $contentPlacement = CRM_Utils_Hook::SUMMARY_ABOVE;
+/**
+ * [remoteidsync_civicrm_pageRun description]
+ */
+function remoteidsync_civicrm_pageRun(&$page) {
+  $customFieldInfo = CRM_Remoteidsync_Form_Settings::getCustomFieldForThisDB();
   $settings = CRM_Remoteidsync_Form_Settings::getSettings([]);
-  if (!empty($customFieldInThisDB['custom_field_id']) && !empty($settings['remoteidsync_baseurl'])) {
-    $customField = 'custom_' . $customFieldInThisDB['custom_field_id'];
-    try {
-      $remoteIDCall = civicrm_api3('Contact', 'getsingle', array(
-        'id' => $contactID,
-        'return' => $customField,
-        'sequential' => 1,
-      ));
-    }
-    catch (CiviCRM_API3_Exception $e) {
-      $error = $e->getMessage();
-      CRM_Core_Error::debug_log_message(ts('API Error %1', array(
-        'domain' => 'com.aghstrategies.remoteidsync',
-        1 => $error,
-      )));
-    }
-    if (!empty($remoteIDCall[$customField])) {
-      $remoteID = $remoteIDCall[$customField];
-    }
-    // TODO abstract out url
-    $content = "<div>
-      <div class='crm-label'>
-        Remote ID: <a href='{$settings['remoteidsync_baseurl']}{$remoteID}'>$remoteID</a>
-      </div>
-    </div>";
-  }
+  $customFieldInfo['base_url'] = $settings['remoteidsync_baseurl'];
+  CRM_Core_Resources::singleton()->addVars('remoteidsync', array('info' => $customFieldInfo));
+  CRM_Core_Resources::singleton()->addScriptFile('com.aghstrategies.remoteidsync', 'js/link.js');
 }
 
 /**
