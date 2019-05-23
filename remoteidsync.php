@@ -54,7 +54,7 @@ function remoteidsync_civicrm_summary($contactID, &$content, &$contentPlacement)
     // TODO abstract out url
     $content = "<div>
       <div class='crm-label'>
-        Remote ID: <a href='{$settings['remoteidsync_baseurl']}/civicrm/contact/view?reset=1&cid={$remoteID}'>$remoteID</a>
+        Remote ID: <a href='{$settings['remoteidsync_baseurl']}civicrm/contact/view?reset=1&cid={$remoteID}'>$remoteID</a>
       </div>
     </div>";
   }
@@ -68,7 +68,7 @@ function remoteidsync_civicrm_custom($op, $groupID, $entityID, $params) {
         if (!empty($values['value']) && $values['custom_field_id'] == $settings['remoteidsync_customfield']) {
           $contactIdInOtherDB = $values['value'];
           $contactIdInThisDB = $entityID;
-          $apiCall = "{$settings['remoteidsync_apiendpoint']}?entity=Contact&action=create&api_key={$settings['remoteidsync_apikey']}&key={$settings['remoteidsync_sitekey']}&json=1&id={$contactIdInThisDB}&custom_{$settings['remoteidsync_customfield']}={$contactIdInOtherDB}";
+          $apiCall = "{$settings['remoteidsync_apiendpoint']}?entity=Contact&action=create&api_key={$settings['remoteidsync_apikey']}&key={$settings['remoteidsync_sitekey']}&json=1&id={$contactIdInOtherDB}&custom_{$settings['remoteidsync_customfield']}={$contactIdInThisDB}";
           $result = apiCall($apiCall);
           if ($result) {
             CRM_Core_Session::setStatus(ts('Remote ID synced'), ts('Remote ID'), 'success');
