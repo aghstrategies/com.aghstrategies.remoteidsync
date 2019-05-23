@@ -91,7 +91,7 @@ class CRM_Remoteidsync_Form_Settings extends CRM_Core_Form {
     if (!empty($params)) {
       try {
         $existingSetting = civicrm_api3('Setting', 'create', $params);
-        CRM_Core_Session::setStatus(ts('Settings Updated'));
+        CRM_Core_Session::setStatus(ts('Settings Successfully Saved'), ts('Remote ID Sync'), 'success');
       }
       catch (CiviCRM_API3_Exception $e) {
         $error = $e->getMessage();
