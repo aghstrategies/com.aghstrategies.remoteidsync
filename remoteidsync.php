@@ -103,6 +103,87 @@ function remoteidsync_civicrm_xmlMenu(&$files) {
  * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_install
  */
 function remoteidsync_civicrm_install() {
+  $groupID = NULL;
+  // Check if custom field group exsists
+  try {
+    $groupCheck = civicrm_api3('CustomGroup', 'getsingle', [
+      'title' => "Remote ID",
+    ]);
+  }
+  catch (CiviCRM_API3_Exception $e) {
+    $error = $e->getMessage();
+    CRM_Core_Error::debug_log_message(ts('API Error %1', array(
+      'domain' => 'com.aghstrategies.remoteidsync',
+      1 => $error,
+    )));
+  }
+  // If found save
+  if (!empty($groupCheck['id'])) {
+    $groupID = $groupCheck['id'];
+  }
+  // If no existing custom field group create one
+  else {
+    try {
+      $group = civicrm_api3('CustomGroup', 'create', [
+        'title' => "Remote ID",
+        'extends' => "Contact",
+      ]);
+    }
+    catch (CiviCRM_API3_Exception $e) {
+      $error = $e->getMessage();
+      CRM_Core_Error::debug_log_message(ts('API Error %1', array(
+        'domain' => 'com.aghstrategies.remoteidsync',
+        1 => $error,
+      )));
+    }
+    if (!empty($group['id'])) {
+      $groupID = $group['id'];
+    }
+  }
+  // Now we should have a group id lets check for a field
+  if ($groupID) {
+    try {
+      $fieldCheck = civicrm_api3('CustomField', 'getsingle', [
+        'custom_group_id' => $groupID,
+        'label' => "Remote ID",
+        'name' => "Remote_Id",
+        "data_type" => "Int",
+        "html_type" => "Text",
+        "is_active" => "1",
+        "is_view" => "0",
+        "text_length" => "255",
+      ]);
+    }
+    catch (CiviCRM_API3_Exception $e) {
+      $error = $e->getMessage();
+      CRM_Core_Error::debug_log_message(ts('API Error %1', array(
+        'domain' => 'com.aghstrategies.remoteidsync',
+        1 => $error,
+      )));
+    }
+    if (empty($fieldCheck['id'])) {
+      try {
+        $fieldCheck = civicrm_api3('CustomField', 'create', [
+          'custom_group_id' => $groupID,
+          'label' => "Remote ID",
+          'name' => "Remote_Id",
+          "data_type" => "Int",
+          "html_type" => "Text",
+          "is_active" => "1",
+          "is_view" => "0",
+          "text_length" => "255",
+        ]);
+      }
+      catch (CiviCRM_API3_Exception $e) {
+        $error = $e->getMessage();
+        CRM_Core_Error::debug_log_message(ts('API Error %1', array(
+          'domain' => 'com.aghstrategies.remoteidsync',
+          1 => $error,
+        )));
+      }
+    }
+  }
+
   _remoteidsync_civix_civicrm_install();
 }
 
