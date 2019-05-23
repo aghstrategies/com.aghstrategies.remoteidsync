@@ -107,7 +107,7 @@ function remoteidsync_civicrm_install() {
   // Check if custom field group exsists
   try {
     $groupCheck = civicrm_api3('CustomGroup', 'getsingle', [
-      'title' => "Remote ID",
+      'name' => 'Remote_ID',
     ]);
   }
   catch (CiviCRM_API3_Exception $e) {
@@ -126,6 +126,7 @@ function remoteidsync_civicrm_install() {
     try {
       $group = civicrm_api3('CustomGroup', 'create', [
         'title' => "Remote ID",
+        'name' => 'Remote_ID',
         'extends' => "Contact",
       ]);
     }
@@ -145,13 +146,13 @@ function remoteidsync_civicrm_install() {
     try {
       $fieldCheck = civicrm_api3('CustomField', 'getsingle', [
         'custom_group_id' => $groupID,
-        'label' => "Remote ID",
+        // 'label' => "Remote ID",
         'name' => "Remote_Id",
-        "data_type" => "Int",
-        "html_type" => "Text",
-        "is_active" => "1",
-        "is_view" => "0",
-        "text_length" => "255",
+        // "data_type" => "Int",
+        // "html_type" => "Text",
+        // "is_active" => "1",
+        // "is_view" => "0",
+        // "text_length" => "255",
       ]);
     }
     catch (CiviCRM_API3_Exception $e) {

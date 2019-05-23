@@ -9,6 +9,24 @@ use CRM_Remoteidsync_ExtensionUtil as E;
  */
 class CRM_Remoteidsync_Form_Settings extends CRM_Core_Form {
 
+  public function getCustomFieldForThisDB() {
+    $customFieldId = NULL;
+    try {
+      $customField = civicrm_api3('CustomGroup', 'getsingle', [
+        'name' => "Remote_ID",
+        'api.CustomField.getsingle' => ['custom_group_id' => "\$value.id", 'name' => "Remote_Id"],
+      ]);
+    }
+    catch (CiviCRM_API3_Exception $e) {
+      $error = $e->getMessage();
+      CRM_Core_Error::debug_log_message(ts('API Error: %1', array(1 => $error, 'domain' => 'com.aghstrategies.remoteidsync')));
+    }
+    if (!empty($customField["api.CustomField.getsingle"]['id'])) {
+      $customFieldId = $customField["api.CustomField.getsingle"]['id'];
+    }
+    return $customFieldId;
+  }
+
   public function buildQuickForm() {
     $settingFields = self::settingsFields();
     foreach ($settingFields as $name => $label) {
@@ -28,7 +46,8 @@ class CRM_Remoteidsync_Form_Settings extends CRM_Core_Form {
 
     // export form elements
     $this->assign('elementNames', $this->getRenderableElementNames());
-
+    $customField = self::getCustomFieldForThisDB();
+    $this->assign('customField', $customField);
     $defaults = self::getSettings($settingFields);
     $this->setDefaults($defaults);
 
