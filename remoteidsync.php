@@ -30,10 +30,11 @@ function apiCall($url, $timeout = 0.50) {
 
 function remoteidsync_civicrm_summary($contactID, &$content, &$contentPlacement) {
   $remoteID = NULL;
+  $customFieldInThisDB = CRM_Remoteidsync_Form_Settings::getCustomFieldForThisDB();
   $contentPlacement = CRM_Utils_Hook::SUMMARY_ABOVE;
   $settings = CRM_Remoteidsync_Form_Settings::getSettings([]);
-  if (!empty($settings['remoteidsync_customfield']) && !empty($settings['remoteidsync_baseurl'])) {
-    $customField = 'custom_' . $settings['remoteidsync_customfield'];
+  if (!empty($customFieldInThisDB) && !empty($settings['remoteidsync_baseurl'])) {
+    $customField = 'custom_' . $customFieldInThisDB;
     try {
       $remoteIDCall = civicrm_api3('Contact', 'getsingle', array(
         'id' => $contactID,
