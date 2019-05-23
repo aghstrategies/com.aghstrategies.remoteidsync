@@ -87,17 +87,17 @@ function remoteidsync_civicrm_custom($op, $groupID, $entityID, $params) {
             }
           }
           // Remote ID has been deleted, delete it on the other side
-          else {
-            $contactInOtherDB = checkForContactInOtherDB($settings, $contactIdInThisDB);
-            if ($contactInOtherDB->count == 1 && !empty($contactInOtherDB->id)) {
-              $apiCall3 = "{$settings['remoteidsync_apiendpoint']}?entity=Contact&action=create&api_key={$settings['remoteidsync_apikey']}&key={$settings['remoteidsync_sitekey']}&json=1&id={$contactInOtherDB->id}&custom_{$settings['remoteidsync_customfield']}=";
-              $result = apiCall($apiCall3, 'POST');
-              $contactInOtherDB2 = checkForContactInOtherDB($settings, $contactIdInThisDB);
-              if ($contactInOtherDB2->count == 0) {
-                CRM_Core_Session::setStatus(ts('the Remote ID was deleted for this contact. The remote database has been updated to reflect that these contacts are no longer synced.'), ts('Remote ID'), 'success');
-              }
-            }
-          }
+          // else {
+          //   $contactInOtherDB = checkForContactInOtherDB($settings, $contactIdInThisDB);
+          //   if ($contactInOtherDB->count == 1 && !empty($contactInOtherDB->id)) {
+          //     $apiCall3 = "{$settings['remoteidsync_apiendpoint']}?entity=Contact&action=create&api_key={$settings['remoteidsync_apikey']}&key={$settings['remoteidsync_sitekey']}&json=1&id={$contactInOtherDB->id}&custom_{$settings['remoteidsync_customfield']}=";
+          //     $result = apiCall($apiCall3, 'POST');
+          //     $contactInOtherDB2 = checkForContactInOtherDB($settings, $contactIdInThisDB);
+          //     if ($contactInOtherDB2->count == 0) {
+          //       CRM_Core_Session::setStatus(ts('the Remote ID was deleted for this contact. The remote database has been updated to reflect that these contacts are no longer synced.'), ts('Remote ID'), 'success');
+          //     }
+          //   }
+          // }
         }
       }
     }
