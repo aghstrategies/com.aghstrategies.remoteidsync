@@ -94,7 +94,7 @@ function remoteidsync_civicrm_custom($op, $groupID, $entityID, $params) {
               exit;
             }
             // the remote id has been changed need to update accordingly
-            elseif ($checkIfWeNeedToUpdate->count == 1 && !empty($contactInOtherDB->id) && $checkIfWeNeedToUpdate->id != $contactIdInOtherDB) {
+            elseif ($checkIfWeNeedToUpdate->count == 1 && !empty($checkIfWeNeedToUpdate->id) && $checkIfWeNeedToUpdate->id != $contactIdInOtherDB) {
               // first delete the other remote id
               deleteOutOfDateReference($settings, $checkIfWeNeedToUpdate->id);
 
