@@ -87,7 +87,7 @@ function remoteidsync_civicrm_custom($op, $groupID, $entityID, $params) {
             }
           }
           // Remote ID has been deleted, delete it on the other side
-          if (empty($values['value'])) {
+          else {
             $contactInOtherDB = checkForContactInOtherDB($settings, $contactIdInThisDB);
             if ($contactInOtherDB->count == 1 && !empty($contactInOtherDB->id)) {
               $apiCall3 = "{$settings['remoteidsync_apiendpoint']}?entity=Contact&action=create&api_key={$settings['remoteidsync_apikey']}&key={$settings['remoteidsync_sitekey']}&json=1&id={$contactInOtherDB->id}&custom_{$settings['remoteidsync_customfield']}=";
