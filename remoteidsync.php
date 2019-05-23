@@ -62,12 +62,7 @@ function remoteidsync_civicrm_summary($contactID, &$content, &$contentPlacement)
 }
 
 /**
- * [remoteidsync_civicrm_custom description]
- * @param  [type] $op       [description]
- * @param  [type] $groupID  [description]
- * @param  [type] $entityID [description]
- * @param  [type] $params   [description]
- * @return [type]           [description]
+ * Implements hook_civicrm_custom().
  */
 function remoteidsync_civicrm_custom($op, $groupID, $entityID, $params) {
   if ($op == 'create' || $op == 'edit') {
@@ -84,7 +79,7 @@ function remoteidsync_civicrm_custom($op, $groupID, $entityID, $params) {
           // If the field has a value
           if (!empty($values['value'])) {
             $contactIdInOtherDB = $values['value'];
-            $checkIfWeNeedToUpdate = checkForContactInOtherDB($settings, $contactIdInThisDB);
+            $checkIfWeNeedToUpdate = remoteidsync_checkForContactInOtherDB($settings, $contactIdInThisDB);
             // More than one id found throw an error
             if ($checkIfWeNeedToUpdate->count > 1) {
               CRM_Core_Session::setStatus(ts('Remote ID NOT synced, multiple links found'), ts('Remote ID'), 'error');
@@ -96,22 +91,22 @@ function remoteidsync_civicrm_custom($op, $groupID, $entityID, $params) {
             // the remote id has been changed need to update accordingly
             elseif ($checkIfWeNeedToUpdate->count == 1 && !empty($checkIfWeNeedToUpdate->id) && $checkIfWeNeedToUpdate->id != $contactIdInOtherDB) {
               // first delete the other remote id
-              deleteOutOfDateReference($settings, $checkIfWeNeedToUpdate->id);
+              remoteidsync_deleteOutOfDateReference($settings, $checkIfWeNeedToUpdate->id);
 
               // then create new one
-              createNewLink('updated', $settings, $contactIdInOtherDB, $contactIdInThisDB);
+              remoteidsync_createnewlink('updated', $settings, $contactIdInOtherDB, $contactIdInThisDB);
             }
             // no match found need to create
             elseif ($checkIfWeNeedToUpdate->count == 0) {
-              createNewLink('created', $settings, $contactIdInOtherDB, $contactIdInThisDB);
+              remoteidsync_createnewlink('created', $settings, $contactIdInOtherDB, $contactIdInThisDB);
             }
           }
           // Remote ID has been deleted, delete it on the other side
           elseif (empty($values['value'])) {
-            $contactInOtherDB = checkForContactInOtherDB($settings, $contactIdInThisDB);
+            $contactInOtherDB = remoteidsync_checkForContactInOtherDB($settings, $contactIdInThisDB);
             if ($contactInOtherDB->count == 1 && !empty($contactInOtherDB->id)) {
-              deleteOutOfDateReference($settings, $contactInOtherDB->id);
-              $contactInOtherDB2 = checkForContactInOtherDB($settings, $contactIdInThisDB);
+              remoteidsync_deleteOutOfDateReference($settings, $contactInOtherDB->id);
+              $contactInOtherDB2 = remoteidsync_checkForContactInOtherDB($settings, $contactIdInThisDB);
               if ($contactInOtherDB2->count == 0) {
                 CRM_Core_Session::setStatus(ts('the Remote ID was deleted for this contact. The remote database has been updated to reflect that these contacts are no longer synced.'), ts('Remote ID'), 'success');
               }
@@ -123,10 +118,17 @@ function remoteidsync_civicrm_custom($op, $groupID, $entityID, $params) {
   }
 }
 
-function createNewLink($operation, $settings, $contactIdInOtherDB, $contactIdInThisDB) {
+/**
+ * Create a link
+ * @param  string $operation         creating or updating
+ * @param  array $settings           apiURL, api key and site key
+ * @param  int $contactIdInOtherDB   contact id in the other database
+ * @param  int $contactIdInThisDB    contact id in this database
+ */
+function remoteidsync_createnewlink($operation, $settings, $contactIdInOtherDB, $contactIdInThisDB) {
   $apiCall = "{$settings['remoteidsync_apiendpoint']}?entity=Contact&action=create&api_key={$settings['remoteidsync_apikey']}&key={$settings['remoteidsync_sitekey']}&json=1&id={$contactIdInOtherDB}&custom_{$settings['remoteidsync_customfield']}={$contactIdInThisDB}";
   $result = apiCall($apiCall);
-  $check = checkForContactInOtherDB($settings, $contactIdInThisDB);
+  $check = remoteidsync_checkForContactInOtherDB($settings, $contactIdInThisDB);
   // check that the sync worked and show success or error message
   if ($check->count == 1 && $check->id == $contactIdInOtherDB) {
     CRM_Core_Session::setStatus(ts("Remote ID sync $operation"), ts('Remote ID'), 'success');
@@ -136,12 +138,23 @@ function createNewLink($operation, $settings, $contactIdInOtherDB, $contactIdInT
   }
 }
 
-function deleteOutOfDateReference($settings, $contactInOtherDB) {
+/**
+ * Delete link
+ * @param  array $settings           apiURL, api key and site key
+ * @param  int $contactInOtherDB   contact id of the contact in the other database that needs to be updated
+ */
+function remoteidsync_deleteOutOfDateReference($settings, $contactInOtherDB) {
   $apiCall = "{$settings['remoteidsync_apiendpoint']}?entity=Contact&action=create&api_key={$settings['remoteidsync_apikey']}&key={$settings['remoteidsync_sitekey']}&json=1&id={$contactInOtherDB}&custom_{$settings['remoteidsync_customfield']}=";
   $result = apiCall($apiCall);
 }
 
-function checkForContactInOtherDB($settings, $contactIdInThisDB) {
+/**
+ * Check if there is a contact in the other database that is linked to this one
+ * @param  array $settings            apiURL, api key and site key
+ * @param  boolean $contactIdInThisDB contact record in this db being edited
+ * @return obj                        response from other site
+ */
+function remoteidsync_checkForContactInOtherDB($settings, $contactIdInThisDB) {
   $apiCall = "{$settings['remoteidsync_apiendpoint']}?entity=Contact&action=get&api_key={$settings['remoteidsync_apikey']}&key={$settings['remoteidsync_sitekey']}&json=1&custom_{$settings['remoteidsync_customfield']}={$contactIdInThisDB}";
   $findInOtherDB = file_get_contents($apiCall);
   $contactInOtherDB = json_decode($findInOtherDB);
