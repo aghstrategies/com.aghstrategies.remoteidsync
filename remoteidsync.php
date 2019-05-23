@@ -65,23 +65,45 @@ function remoteidsync_civicrm_custom($op, $groupID, $entityID, $params) {
   if ($op == 'create' || $op == 'edit') {
     $customFieldInThisDB = CRM_Remoteidsync_Form_Settings::getCustomFieldForThisDB();
     $settings = CRM_Remoteidsync_Form_Settings::getSettings([]);
+    $contactIdInThisDB = $entityID;
     if (!empty($settings['remoteidsync_customfield'])
     && !empty($customFieldInThisDB['custom_group_id'])
     && !empty($customFieldInThisDB['custom_field_id'])
     && $groupID == $customFieldInThisDB['custom_group_id']) {
       foreach ($params as $key => $values) {
-        if (!empty($values['value']) && $values['custom_field_id'] == $customFieldInThisDB) {
-          $contactIdInOtherDB = $values['value'];
-          $contactIdInThisDB = $entityID;
-          $apiCall = "{$settings['remoteidsync_apiendpoint']}?entity=Contact&action=create&api_key={$settings['remoteidsync_apikey']}&key={$settings['remoteidsync_sitekey']}&json=1&id={$contactIdInOtherDB}&custom_{$settings['remoteidsync_customfield']}={$contactIdInThisDB}";
-          $result = apiCall($apiCall);
-          if ($result) {
-            CRM_Core_Session::setStatus(ts('Remote ID synced'), ts('Remote ID'), 'success');
+        if ($values['custom_field_id'] == $customFieldInThisDB['custom_field_id']) {
+          if (!empty($values['value'])) {
+            $contactIdInOtherDB = $values['value'];
+            $apiCall = "{$settings['remoteidsync_apiendpoint']}?entity=Contact&action=create&api_key={$settings['remoteidsync_apikey']}&key={$settings['remoteidsync_sitekey']}&json=1&id={$contactIdInOtherDB}&custom_{$settings['remoteidsync_customfield']}={$contactIdInThisDB}";
+            $result = apiCall($apiCall);
+            // TODO actually check that this worked
+            if ($result) {
+              CRM_Core_Session::setStatus(ts('Remote ID synced'), ts('Remote ID'), 'success');
+            }
+          }
+          // Remote ID has been deleted, delete it on the other side
+          if (empty($values['value'])) {
+            $contactInOtherDB = checkForContactInOtherDB($settings, $contactIdInThisDB);
+            if ($contactInOtherDB->count == 1 && !empty($contactInOtherDB->id)) {
+              $apiCall3 = "{$settings['remoteidsync_apiendpoint']}?entity=Contact&action=create&api_key={$settings['remoteidsync_apikey']}&key={$settings['remoteidsync_sitekey']}&json=1&id={$contactInOtherDB->id}&custom_{$settings['remoteidsync_customfield']}=";
+              $result = apiCall($apiCall3, 'POST');
+              $contactInOtherDB2 = checkForContactInOtherDB($settings, $contactIdInThisDB);
+              if ($contactInOtherDB2->count == 0) {
+                CRM_Core_Session::setStatus(ts('the Remote ID was deleted for this contact. The remote database has been updated to reflect that these contacts are no longer synced.'), ts('Remote ID'), 'success');
+              }
+            }
           }
         }
       }
     }
   }
+}
+
+function checkForContactInOtherDB($settings, $contactIdInThisDB) {
+  $apiCall = "{$settings['remoteidsync_apiendpoint']}?entity=Contact&action=get&api_key={$settings['remoteidsync_apikey']}&key={$settings['remoteidsync_sitekey']}&json=1&custom_{$settings['remoteidsync_customfield']}={$contactIdInThisDB}";
+  $findInOtherDB = file_get_contents($apiCall);
+  $contactInOtherDB = json_decode($findInOtherDB);
+  return $contactInOtherDB;
 }
 
 /**
