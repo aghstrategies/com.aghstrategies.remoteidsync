@@ -123,7 +123,7 @@ function remoteidsync_civicrm_custom($op, $groupID, $entityID, $params) {
   }
 }
 
-function createNewLink($operation, $settings, $contactIdInOtherDB) {
+function createNewLink($operation, $settings, $contactIdInOtherDB, $contactIdInThisDB) {
   $apiCall = "{$settings['remoteidsync_apiendpoint']}?entity=Contact&action=create&api_key={$settings['remoteidsync_apikey']}&key={$settings['remoteidsync_sitekey']}&json=1&id={$contactIdInOtherDB}&custom_{$settings['remoteidsync_customfield']}={$contactIdInThisDB}";
   $result = apiCall($apiCall);
   $check = checkForContactInOtherDB($settings, $contactIdInThisDB);
