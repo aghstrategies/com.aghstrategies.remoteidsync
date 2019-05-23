@@ -28,38 +28,38 @@ function apiCall($url, $timeout = 0.50) {
   return $fileExists;
 }
 
-// function remoteidsync_civicrm_summary($contactID, &$content, &$contentPlacement) {
-//   $remoteID = NULL;
-//   $customFieldInThisDB = CRM_Remoteidsync_Form_Settings::getCustomFieldForThisDB();
-//   $contentPlacement = CRM_Utils_Hook::SUMMARY_ABOVE;
-//   $settings = CRM_Remoteidsync_Form_Settings::getSettings([]);
-//   if (!empty($customFieldInThisDB['custom_field_id']) && !empty($settings['remoteidsync_baseurl'])) {
-//     $customField = 'custom_' . $customFieldInThisDB['custom_field_id'];
-//     try {
-//       $remoteIDCall = civicrm_api3('Contact', 'getsingle', array(
-//         'id' => $contactID,
-//         'return' => $customField,
-//         'sequential' => 1,
-//       ));
-//     }
-//     catch (CiviCRM_API3_Exception $e) {
-//       $error = $e->getMessage();
-//       CRM_Core_Error::debug_log_message(ts('API Error %1', array(
-//         'domain' => 'com.aghstrategies.remoteidsync',
-//         1 => $error,
-//       )));
-//     }
-//     if (!empty($remoteIDCall[$customField])) {
-//       $remoteID = $remoteIDCall[$customField];
-//     }
-//     // TODO abstract out url
-//     $content = "<div>
-//       <div class='crm-label'>
-//         Remote ID: <a href='{$settings['remoteidsync_baseurl']}{$remoteID}'>$remoteID</a>
-//       </div>
-//     </div>";
-//   }
-// }
+function remoteidsync_civicrm_summary($contactID, &$content, &$contentPlacement) {
+  $remoteID = NULL;
+  $customFieldInThisDB = CRM_Remoteidsync_Form_Settings::getCustomFieldForThisDB();
+  $contentPlacement = CRM_Utils_Hook::SUMMARY_ABOVE;
+  $settings = CRM_Remoteidsync_Form_Settings::getSettings([]);
+  if (!empty($customFieldInThisDB['custom_field_id']) && !empty($settings['remoteidsync_baseurl'])) {
+    $customField = 'custom_' . $customFieldInThisDB['custom_field_id'];
+    try {
+      $remoteIDCall = civicrm_api3('Contact', 'getsingle', array(
+        'id' => $contactID,
+        'return' => $customField,
+        'sequential' => 1,
+      ));
+    }
+    catch (CiviCRM_API3_Exception $e) {
+      $error = $e->getMessage();
+      CRM_Core_Error::debug_log_message(ts('API Error %1', array(
+        'domain' => 'com.aghstrategies.remoteidsync',
+        1 => $error,
+      )));
+    }
+    if (!empty($remoteIDCall[$customField])) {
+      $remoteID = $remoteIDCall[$customField];
+    }
+    // TODO abstract out url
+    $content = "<div>
+      <div class='crm-label'>
+        Remote ID: <a href='{$settings['remoteidsync_baseurl']}{$remoteID}'>$remoteID</a>
+      </div>
+    </div>";
+  }
+}
 
 /**
  * [remoteidsync_civicrm_custom description]
@@ -90,33 +90,27 @@ function remoteidsync_civicrm_custom($op, $groupID, $entityID, $params) {
               CRM_Core_Session::setStatus(ts('Remote ID NOT synced, multiple links found'), ts('Remote ID'), 'error');
             }
             // 1 match found and its up to date do nothing
-            elseif ($checkIfWeNeedToUpdate->count == 1 && $checkIfWeNeedToUpdate->id == $contactIdInOtherDB) {
+            elseif ($checkIfWeNeedToUpdate->count == 1 && !empty($contactInOtherDB->id) && $checkIfWeNeedToUpdate->id == $contactIdInOtherDB) {
               exit;
             }
-            // TODO deal with change
-            elseif ($checkIfWeNeedToUpdate->count == 1 && $checkIfWeNeedToUpdate->id != $contactIdInOtherDB) {
-              CRM_Core_Session::setStatus(ts('MisMatch need to deal'), ts('Remote ID'), 'success');
+            // the remote id has been changed need to update accordingly
+            elseif ($checkIfWeNeedToUpdate->count == 1 && !empty($contactInOtherDB->id) && $checkIfWeNeedToUpdate->id != $contactIdInOtherDB) {
+              // first delete the other remote id
+              deleteOutOfDateReference($settings, $checkIfWeNeedToUpdate->id);
+
+              // then create new one
+              createNewLink('updated', $settings, $contactIdInOtherDB, $contactIdInThisDB);
             }
             // no match found need to create
             elseif ($checkIfWeNeedToUpdate->count == 0) {
-              $apiCall = "{$settings['remoteidsync_apiendpoint']}?entity=Contact&action=create&api_key={$settings['remoteidsync_apikey']}&key={$settings['remoteidsync_sitekey']}&json=1&id={$contactIdInOtherDB}&custom_{$settings['remoteidsync_customfield']}={$contactIdInThisDB}";
-              $result = apiCall($apiCall);
-              $check = checkForContactInOtherDB($settings, $contactIdInThisDB);
-              // check that the sync worked and show success or error message
-              if ($check->count == 1 && $check->id == $contactIdInOtherDB) {
-                CRM_Core_Session::setStatus(ts('Remote ID synced'), ts('Remote ID'), 'success');
-              }
-              else {
-                CRM_Core_Session::setStatus(ts('Remote ID NOT synced'), ts('Remote ID'), 'error');
-              }
+              createNewLink('created', $settings, $contactIdInOtherDB, $contactIdInThisDB);
             }
           }
           // Remote ID has been deleted, delete it on the other side
           elseif (empty($values['value'])) {
             $contactInOtherDB = checkForContactInOtherDB($settings, $contactIdInThisDB);
             if ($contactInOtherDB->count == 1 && !empty($contactInOtherDB->id)) {
-              $apiCall3 = "{$settings['remoteidsync_apiendpoint']}?entity=Contact&action=create&api_key={$settings['remoteidsync_apikey']}&key={$settings['remoteidsync_sitekey']}&json=1&id={$contactInOtherDB->id}&custom_{$settings['remoteidsync_customfield']}=";
-              $result = apiCall($apiCall3, 'POST');
+              deleteOutOfDateReference($settings, $contactInOtherDB->id);
               $contactInOtherDB2 = checkForContactInOtherDB($settings, $contactIdInThisDB);
               if ($contactInOtherDB2->count == 0) {
                 CRM_Core_Session::setStatus(ts('the Remote ID was deleted for this contact. The remote database has been updated to reflect that these contacts are no longer synced.'), ts('Remote ID'), 'success');
@@ -127,6 +121,24 @@ function remoteidsync_civicrm_custom($op, $groupID, $entityID, $params) {
       }
     }
   }
+}
+
+function createNewLink($operation, $settings, $contactIdInOtherDB) {
+  $apiCall = "{$settings['remoteidsync_apiendpoint']}?entity=Contact&action=create&api_key={$settings['remoteidsync_apikey']}&key={$settings['remoteidsync_sitekey']}&json=1&id={$contactIdInOtherDB}&custom_{$settings['remoteidsync_customfield']}={$contactIdInThisDB}";
+  $result = apiCall($apiCall);
+  $check = checkForContactInOtherDB($settings, $contactIdInThisDB);
+  // check that the sync worked and show success or error message
+  if ($check->count == 1 && $check->id == $contactIdInOtherDB) {
+    CRM_Core_Session::setStatus(ts("Remote ID sync $operation"), ts('Remote ID'), 'success');
+  }
+  else {
+    CRM_Core_Session::setStatus(ts("Remote ID NOT sync not $operation"), ts('Remote ID'), 'error');
+  }
+}
+
+function deleteOutOfDateReference($settings, $contactInOtherDB) {
+  $apiCall = "{$settings['remoteidsync_apiendpoint']}?entity=Contact&action=create&api_key={$settings['remoteidsync_apikey']}&key={$settings['remoteidsync_sitekey']}&json=1&id={$contactInOtherDB}&custom_{$settings['remoteidsync_customfield']}=";
+  $result = apiCall($apiCall);
 }
 
 function checkForContactInOtherDB($settings, $contactIdInThisDB) {
