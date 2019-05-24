@@ -112,12 +112,12 @@ function remoteidsync_createnewlink($operation, $settings, $contactIdInOtherDB, 
   $result = remoteidsync_apicall($apiCall, 'POST');
   $check = remoteidsync_checkForContactInOtherDB($settings, $contactIdInThisDB);
   // check that the sync worked and show success or error message
-  if ($check->count >= 1) {
-    CRM_Core_Session::setStatus(ts("Remote ID link $operation"), ts('Remote ID'), 'success');
-  }
-  else {
-    CRM_Core_Session::setStatus(ts("Remote ID link not $operation"), ts('Remote ID'), 'error');
-  }
+ // if ($check->count >= 1) {
+  //  CRM_Core_Session::setStatus(ts("Remote ID link $operation"), ts('Remote ID'), 'success');
+ // }
+ // else {
+  //  CRM_Core_Session::setStatus(ts("Remote ID link not $operation"), ts('Remote ID'), 'error');
+ // }
 }
 
 /**
