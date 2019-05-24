@@ -112,7 +112,7 @@ function remoteidsync_createnewlink($operation, $settings, $contactIdInOtherDB, 
   $result = remoteidsync_apicall($apiCall, 'POST');
   $check = remoteidsync_checkForContactInOtherDB($settings, $contactIdInThisDB);
   // check that the sync worked and show success or error message
-  if ($check->count == 1 && $check->id == $contactIdInOtherDB) {
+  if ($check->count >= 1) {
     CRM_Core_Session::setStatus(ts("Remote ID link $operation"), ts('Remote ID'), 'success');
   }
   else {
@@ -137,7 +137,7 @@ function remoteidsync_deleteOutOfDateReference($settings, $contactInOtherDB) {
  * @return obj                        response from other site
  */
 function remoteidsync_checkForContactInOtherDB($settings, $contactIdInThisDB) {
-  $apiCall = "{$settings['remoteidsync_apiendpoint']}?entity=Contact&action=get&api_key={$settings['remoteidsync_apikey']}&key={$settings['remoteidsync_sitekey']}&json=1&custom_{$settings['remoteidsync_customfield']}={$contactIdInThisDB}&debug=1";
+  $apiCall = "{$settings['remoteidsync_apiendpoint']}?entity=Contact&action=get&api_key={$settings['remoteidsync_apikey']}&key={$settings['remoteidsync_sitekey']}&json=1&custom_{$settings['remoteidsync_customfield']}={$contactIdInThisDB}";
   $result = remoteidsync_apicall($apiCall, 'GET');
   return $result;
 }
