@@ -30,11 +30,11 @@ function remoteidsync_civicrm_summary($contactID, &$content, &$contentPlacement)
     }
     if (!empty($remoteIDCall[$customField])) {
       $remoteID = $remoteIDCall[$customField];
-    }
     // TODO abstract out url
     $content = "<div class='remoteid crm-summary-row'>
       <a class='button round' href='{$settings['remoteidsync_baseurl']}{$remoteID}'>Visit Linked Contact (id: $remoteID)</a>
     </div>";
+    }
   }
 }
 
