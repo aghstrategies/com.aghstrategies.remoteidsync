@@ -5,6 +5,45 @@ use CRM_Remoteidsync_ExtensionUtil as E;
 use GuzzleHttp\Client;
 
 /**
+ * Implements hook_civicrm_summary().
+ */
+function remoteidsync_civicrm_summary($contactID, &$content, &$contentPlacement) {
+  $remoteID = NULL;
+  $customFieldInThisDB = CRM_Remoteidsync_Form_Settings::getCustomFieldForThisDB();
+  $contentPlacement = CRM_Utils_Hook::SUMMARY_ABOVE;
+  $settings = CRM_Remoteidsync_Form_Settings::getSettings([]);
+  if (!empty($customFieldInThisDB['custom_field_id']) && !empty($settings['remoteidsync_baseurl'])) {
+    $customField = 'custom_' . $customFieldInThisDB['custom_field_id'];
+    try {
+      $remoteIDCall = civicrm_api3('Contact', 'getsingle', array(
+        'id' => $contactID,
+        'return' => $customField,
+        'sequential' => 1,
+      ));
+    }
+    catch (CiviCRM_API3_Exception $e) {
+      $error = $e->getMessage();
+      CRM_Core_Error::debug_log_message(ts('API Error %1', array(
+        'domain' => 'com.aghstrategies.remoteidsync',
+        1 => $error,
+      )));
+    }
+    if (!empty($remoteIDCall[$customField])) {
+      $remoteID = $remoteIDCall[$customField];
+    }
+    // TODO abstract out url
+    $content = "<div class='remoteid crm-summary-row'>
+      <div class='crm-label'>
+        Remote ID:
+      </div>
+      <div class='crm-content'>
+      <a href='{$settings['remoteidsync_baseurl']}{$remoteID}'>$remoteID</a>
+      </div>
+    </div>";
+  }
+}
+
+/**
  * Rest API Call using guzzle
  *
  * @param string $url
@@ -32,7 +71,7 @@ function remoteidsync_apicall($url, $method = 'POST') {
 }
 
 /**
- * [remoteidsync_civicrm_pageRun description]
+ * Implements hook_civicrm_pageRun().
  */
 function remoteidsync_civicrm_pageRun(&$page) {
   $customFieldInfo = CRM_Remoteidsync_Form_Settings::getCustomFieldForThisDB();
