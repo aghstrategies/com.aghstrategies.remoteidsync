@@ -30,8 +30,7 @@ function remoteidsync_civicrm_summary($contactID, &$content, &$contentPlacement)
     }
     if (!empty($remoteIDCall[$customField])) {
       $remoteID = $remoteIDCall[$customField];
-    // TODO abstract out url
-    $content = "<div class='remoteid crm-summary-row'>
+      $content = "<div class='remoteid crm-summary-row'>
       <a class='button round' href='{$settings['remoteidsync_baseurl']}{$remoteID}'>Visit Linked Contact (id: $remoteID)</a>
     </div>";
     }
@@ -74,6 +73,20 @@ function remoteidsync_civicrm_pageRun(&$page) {
   $customFieldInfo['base_url'] = $settings['remoteidsync_baseurl'];
   CRM_Core_Resources::singleton()->addVars('remoteidsync', array('info' => $customFieldInfo));
   CRM_Core_Resources::singleton()->addScriptFile('com.aghstrategies.remoteidsync', 'js/link.js');
+}
+
+/**
+ * Implements hook_civicrm_buildForm().
+ */
+function remoteidsync_civicrm_buildForm($formName, &$form) {
+  // Strip out white space
+  if ($formName == 'CRM_Contact_Form_Contact' || $formName == 'CRM_Contact_Form_Inline_CustomData') {
+    $customFieldInfo = CRM_Remoteidsync_Form_Settings::getCustomFieldForThisDB();
+    $settings = CRM_Remoteidsync_Form_Settings::getSettings([]);
+    $customFieldInfo['base_url'] = $settings['remoteidsync_baseurl'];
+    CRM_Core_Resources::singleton()->addVars('remoteidsync', array('info' => $customFieldInfo));
+    CRM_Core_Resources::singleton()->addScriptFile('com.aghstrategies.remoteidsync', 'js/stripWhiteSpace.js');
+  }
 }
 
 /**

@@ -14,3 +14,6 @@ Base URL: http://d514.localhost/civicrm/contact/view?reset=1&cid=
 Example settings for wordpress ({site}/wp-admin/admin.php?page=CiviCRM&q=civicrm%2Fremoteidsync%2Fsettings):
 Endpoint for API: http://wp5.localhost/wp-content/plugins/civicrm/civicrm/extern/rest.php
 Base URL: http://wp5.localhost/wp-admin/admin.php?page=CiviCRM&q=civicrm%2Fcontact%2Fview&cid=
+
+
+Strips out white space in the Remote ID Custom Field
