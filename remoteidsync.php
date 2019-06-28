@@ -70,9 +70,11 @@ function remoteidsync_apicall($url, $method = 'POST') {
 function remoteidsync_civicrm_pageRun(&$page) {
   $customFieldInfo = CRM_Remoteidsync_Form_Settings::getCustomFieldForThisDB();
   $settings = CRM_Remoteidsync_Form_Settings::getSettings([]);
-  $customFieldInfo['base_url'] = $settings['remoteidsync_baseurl'];
-  CRM_Core_Resources::singleton()->addVars('remoteidsync', array('info' => $customFieldInfo));
-  CRM_Core_Resources::singleton()->addScriptFile('com.aghstrategies.remoteidsync', 'js/link.js');
+  if (!empty($settings['remoteidsync_baseurl'])) {
+    $customFieldInfo['base_url'] = $settings['remoteidsync_baseurl'];
+    CRM_Core_Resources::singleton()->addVars('remoteidsync', array('info' => $customFieldInfo));
+    CRM_Core_Resources::singleton()->addScriptFile('com.aghstrategies.remoteidsync', 'js/link.js');
+  }
 }
 
 /**
