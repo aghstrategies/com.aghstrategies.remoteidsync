@@ -49,7 +49,7 @@ function remoteidsync_apicall($url, $method = 'POST') {
   try {
     $guzzleClient = new GuzzleHttp\Client();
     $guzzleResponse = $guzzleClient->request($method, $url, array(
-      'timeout' => 0.50,
+      'timeout' => 0.0,
     ));
     $result = 'Guzzle call went thru';
     if ($method == 'GET') {
