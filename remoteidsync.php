@@ -21,7 +21,7 @@ function remoteidsync_civicrm_summary($contactID, &$content, &$contentPlacement)
         'sequential' => 1,
       ));
     }
-    catch (CiviCRM_API3_Exception $e) {
+    catch (CRM_Core_Exception $e) {
       $error = $e->getMessage();
       CRM_Core_Error::debug_log_message(ts('API Error %1', array(
         'domain' => 'com.aghstrategies.remoteidsync',
@@ -213,7 +213,7 @@ function remoteidsync_civicrm_install() {
       'name' => 'Remote_ID',
     ]);
   }
-  catch (CiviCRM_API3_Exception $e) {
+  catch (CRM_Core_Exception $e) {
     $error = $e->getMessage();
     CRM_Core_Error::debug_log_message(ts('API Error %1', array(
       'domain' => 'com.aghstrategies.remoteidsync',
@@ -233,7 +233,7 @@ function remoteidsync_civicrm_install() {
         'extends' => "Contact",
       ]);
     }
-    catch (CiviCRM_API3_Exception $e) {
+    catch (CRM_Core_Exception $e) {
       $error = $e->getMessage();
       CRM_Core_Error::debug_log_message(ts('API Error %1', array(
         'domain' => 'com.aghstrategies.remoteidsync',
@@ -258,7 +258,7 @@ function remoteidsync_civicrm_install() {
         // "text_length" => "255",
       ]);
     }
-    catch (CiviCRM_API3_Exception $e) {
+    catch (CRM_Core_Exception $e) {
       $error = $e->getMessage();
       CRM_Core_Error::debug_log_message(ts('API Error %1', array(
         'domain' => 'com.aghstrategies.remoteidsync',
@@ -278,7 +278,7 @@ function remoteidsync_civicrm_install() {
           "text_length" => "255",
         ]);
       }
-      catch (CiviCRM_API3_Exception $e) {
+      catch (CRM_Core_Exception $e) {
         $error = $e->getMessage();
         CRM_Core_Error::debug_log_message(ts('API Error %1', array(
           'domain' => 'com.aghstrategies.remoteidsync',

@@ -20,7 +20,7 @@ class CRM_Remoteidsync_Form_Settings extends CRM_Core_Form {
         'api.CustomField.getsingle' => ['custom_group_id' => "\$value.id", 'name' => "Remote_Id"],
       ]);
     }
-    catch (CiviCRM_API3_Exception $e) {
+    catch (CRM_Core_Exception $e) {
       $error = $e->getMessage();
       CRM_Core_Error::debug_log_message(ts('API Error: %1', array(1 => $error, 'domain' => 'com.aghstrategies.remoteidsync')));
     }
@@ -77,7 +77,7 @@ class CRM_Remoteidsync_Form_Settings extends CRM_Core_Form {
         'return' => array_keys($settingFields),
       ));
     }
-    catch (CiviCRM_API3_Exception $e) {
+    catch (CRM_Core_Exception $e) {
       $error = $e->getMessage();
       CRM_Core_Error::debug_log_message(ts('API Error: %1', array(1 => $error, 'domain' => 'com.aghstrategies.remoteidsync')));
     }
@@ -118,7 +118,7 @@ class CRM_Remoteidsync_Form_Settings extends CRM_Core_Form {
         $existingSetting = civicrm_api3('Setting', 'create', $params);
         CRM_Core_Session::setStatus(ts('Settings Successfully Saved'), ts('Remote ID Sync'), 'success');
       }
-      catch (CiviCRM_API3_Exception $e) {
+      catch (CRM_Core_Exception $e) {
         $error = $e->getMessage();
         CRM_Core_Error::debug_log_message(
           ts('API Error: %1', array(1 => $error, 'domain' => 'com.aghstrategies.remoteidsync'))
