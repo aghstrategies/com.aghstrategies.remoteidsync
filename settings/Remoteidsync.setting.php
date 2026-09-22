@@ -5,8 +5,8 @@
  * Copyright (C) 2016, AGH Strategies, LLC <info@aghstrategies.com>
  * Licensed under the GNU Affero Public License 3.0 (see LICENSE.txt)
  */
-return array(
-  'remoteidsync_sitekey' => array(
+return [
+  'remoteidsync_sitekey' => [
     'group_name' => 'Remote ID Sync Settings',
     'group' => 'remoteidsync',
     'name' => 'remoteidsync_sitekey',
@@ -17,8 +17,8 @@ return array(
     'is_contact' => 0,
     'description' => 'Site Key',
     'help_text' => 'Site Key',
-  ),
-  'remoteidsync_apikey' => array(
+  ],
+  'remoteidsync_apikey' => [
     'group_name' => 'Remote ID Sync Settings',
     'group' => 'remoteidsync',
     'name' => 'remoteidsync_apikey',
@@ -29,8 +29,8 @@ return array(
     'is_contact' => 0,
     'description' => 'API Key of Remote User',
     'help_text' => 'API Key of Remote User',
-  ),
-  'remoteidsync_apiendpoint' => array(
+  ],
+  'remoteidsync_apiendpoint' => [
     'group_name' => 'Remote ID Sync Settings',
     'group' => 'remoteidsync',
     'name' => 'remoteidsync_apiendpoint',
@@ -41,8 +41,8 @@ return array(
     'is_contact' => 0,
     'description' => 'Endpoint for API',
     'help_text' => 'Endpoint for API',
-  ),
-  'remoteidsync_baseurl' => array(
+  ],
+  'remoteidsync_baseurl' => [
     'group_name' => 'Remote ID Sync Settings',
     'group' => 'remoteidsync',
     'name' => 'remoteidsync_baseurl',
@@ -53,8 +53,8 @@ return array(
     'is_contact' => 0,
     'description' => 'Base URL',
     'help_text' => 'Base URL',
-  ),
-  'remoteidsync_customfield' => array(
+  ],
+  'remoteidsync_customfield' => [
     'group_name' => 'Remote ID Sync Settings',
     'group' => 'remoteidsync',
     'name' => 'remoteidsync_customfield',
@@ -65,5 +65,5 @@ return array(
     'is_contact' => 0,
     'description' => 'Custom Field ID',
     'help_text' => 'Custom Field ID',
-  ),
-);
+  ],
+];
