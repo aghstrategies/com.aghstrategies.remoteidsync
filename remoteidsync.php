@@ -15,18 +15,18 @@ function remoteidsync_civicrm_summary($contactID, &$content, &$contentPlacement)
   if (!empty($customFieldInThisDB['custom_field_id']) && !empty($settings['remoteidsync_baseurl'])) {
     $customField = 'custom_' . $customFieldInThisDB['custom_field_id'];
     try {
-      $remoteIDCall = civicrm_api3('Contact', 'getsingle', array(
+      $remoteIDCall = civicrm_api3('Contact', 'getsingle', [
         'id' => $contactID,
         'return' => $customField,
         'sequential' => 1,
-      ));
+      ]);
     }
     catch (CRM_Core_Exception $e) {
       $error = $e->getMessage();
-      CRM_Core_Error::debug_log_message(ts('API Error %1', array(
+      CRM_Core_Error::debug_log_message(ts('API Error %1', [
         'domain' => 'com.aghstrategies.remoteidsync',
         1 => $error,
-      )));
+      ]));
     }
     if (!empty($remoteIDCall[$customField])) {
       $remoteID = $remoteIDCall[$customField];
@@ -48,9 +48,9 @@ function remoteidsync_apicall($url, $method = 'POST') {
   $result = 'nothing happened yet';
   try {
     $guzzleClient = new GuzzleHttp\Client();
-    $guzzleResponse = $guzzleClient->request($method, $url, array(
+    $guzzleResponse = $guzzleClient->request($method, $url, [
       'timeout' => 0.0,
-    ));
+    ]);
     $result = 'Guzzle call went thru';
     if ($method == 'GET') {
       $result = json_decode($guzzleResponse->getBody()->getContents());
@@ -72,7 +72,7 @@ function remoteidsync_civicrm_pageRun(&$page) {
   $settings = CRM_Remoteidsync_Form_Settings::getSettings([]);
   if (!empty($settings['remoteidsync_baseurl'])) {
     $customFieldInfo['base_url'] = $settings['remoteidsync_baseurl'];
-    CRM_Core_Resources::singleton()->addVars('remoteidsync', array('info' => $customFieldInfo));
+    CRM_Core_Resources::singleton()->addVars('remoteidsync', ['info' => $customFieldInfo]);
     CRM_Core_Resources::singleton()->addScriptFile('com.aghstrategies.remoteidsync', 'js/link.js');
   }
 }
@@ -86,7 +86,7 @@ function remoteidsync_civicrm_buildForm($formName, &$form) {
     $customFieldInfo = CRM_Remoteidsync_Form_Settings::getCustomFieldForThisDB();
     $settings = CRM_Remoteidsync_Form_Settings::getSettings([]);
     $customFieldInfo['base_url'] = $settings['remoteidsync_baseurl'];
-    CRM_Core_Resources::singleton()->addVars('remoteidsync', array('info' => $customFieldInfo));
+    CRM_Core_Resources::singleton()->addVars('remoteidsync', ['info' => $customFieldInfo]);
     CRM_Core_Resources::singleton()->addScriptFile('com.aghstrategies.remoteidsync', 'js/stripWhiteSpace.js');
   }
 }
@@ -215,10 +215,10 @@ function remoteidsync_civicrm_install() {
   }
   catch (CRM_Core_Exception $e) {
     $error = $e->getMessage();
-    CRM_Core_Error::debug_log_message(ts('API Error %1', array(
+    CRM_Core_Error::debug_log_message(ts('API Error %1', [
       'domain' => 'com.aghstrategies.remoteidsync',
       1 => $error,
-    )));
+    ]));
   }
   // If found save
   if (!empty($groupCheck['id'])) {
@@ -235,10 +235,10 @@ function remoteidsync_civicrm_install() {
     }
     catch (CRM_Core_Exception $e) {
       $error = $e->getMessage();
-      CRM_Core_Error::debug_log_message(ts('API Error %1', array(
+      CRM_Core_Error::debug_log_message(ts('API Error %1', [
         'domain' => 'com.aghstrategies.remoteidsync',
         1 => $error,
-      )));
+      ]));
     }
     if (!empty($group['id'])) {
       $groupID = $group['id'];
@@ -260,10 +260,10 @@ function remoteidsync_civicrm_install() {
     }
     catch (CRM_Core_Exception $e) {
       $error = $e->getMessage();
-      CRM_Core_Error::debug_log_message(ts('API Error %1', array(
+      CRM_Core_Error::debug_log_message(ts('API Error %1', [
         'domain' => 'com.aghstrategies.remoteidsync',
         1 => $error,
-      )));
+      ]));
     }
     if (empty($fieldCheck['id'])) {
       try {
@@ -280,10 +280,10 @@ function remoteidsync_civicrm_install() {
       }
       catch (CRM_Core_Exception $e) {
         $error = $e->getMessage();
-        CRM_Core_Error::debug_log_message(ts('API Error %1', array(
+        CRM_Core_Error::debug_log_message(ts('API Error %1', [
           'domain' => 'com.aghstrategies.remoteidsync',
           1 => $error,
-        )));
+        ]));
       }
     }
   }

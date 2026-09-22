@@ -22,7 +22,7 @@ class CRM_Remoteidsync_Form_Settings extends CRM_Core_Form {
     }
     catch (CRM_Core_Exception $e) {
       $error = $e->getMessage();
-      CRM_Core_Error::debug_log_message(ts('API Error: %1', array(1 => $error, 'domain' => 'com.aghstrategies.remoteidsync')));
+      CRM_Core_Error::debug_log_message(ts('API Error: %1', [1 => $error, 'domain' => 'com.aghstrategies.remoteidsync']));
     }
     if (!empty($customField["api.CustomField.getsingle"]['id']) && !empty($customField['id'])) {
       $customFieldInfo['custom_field_id'] = $customField["api.CustomField.getsingle"]['id'];
@@ -40,13 +40,13 @@ class CRM_Remoteidsync_Form_Settings extends CRM_Core_Form {
         ts($label)
       );
     }
-    $this->addButtons(array(
-      array(
+    $this->addButtons([
+      [
         'type' => 'submit',
         'name' => E::ts('Submit'),
         'isDefault' => TRUE,
-      ),
-    ));
+      ],
+    ]);
 
     // export form elements
     $this->assign('elementNames', $this->getRenderableElementNames());
@@ -66,20 +66,20 @@ class CRM_Remoteidsync_Form_Settings extends CRM_Core_Form {
    * @return array                 default values
    */
   public function getSettings($settingFields = []) {
-    $defaults = array();
+    $defaults = [];
 
     if ($settingFields == []) {
       $settingFields = self::settingsFields();
     }
     try {
-      $existingSetting = civicrm_api3('Setting', 'get', array(
+      $existingSetting = civicrm_api3('Setting', 'get', [
         'sequential' => 1,
         'return' => array_keys($settingFields),
-      ));
+      ]);
     }
     catch (CRM_Core_Exception $e) {
       $error = $e->getMessage();
-      CRM_Core_Error::debug_log_message(ts('API Error: %1', array(1 => $error, 'domain' => 'com.aghstrategies.remoteidsync')));
+      CRM_Core_Error::debug_log_message(ts('API Error: %1', [1 => $error, 'domain' => 'com.aghstrategies.remoteidsync']));
     }
     foreach ($settingFields as $name => $label) {
       if (!empty($existingSetting['values'][0][$name])) {
@@ -107,7 +107,7 @@ class CRM_Remoteidsync_Form_Settings extends CRM_Core_Form {
   public function postProcess() {
     $values = $this->exportValues();
     $settingFields = self::settingsFields();
-    $params = array();
+    $params = [];
     foreach ($settingFields as $name => $label) {
       if (!empty($values[$name])) {
         $params[$name] = $values[$name];
@@ -121,7 +121,7 @@ class CRM_Remoteidsync_Form_Settings extends CRM_Core_Form {
       catch (CRM_Core_Exception $e) {
         $error = $e->getMessage();
         CRM_Core_Error::debug_log_message(
-          ts('API Error: %1', array(1 => $error, 'domain' => 'com.aghstrategies.remoteidsync'))
+          ts('API Error: %1', [1 => $error, 'domain' => 'com.aghstrategies.remoteidsync'])
         );
       }
     }
@@ -138,7 +138,7 @@ class CRM_Remoteidsync_Form_Settings extends CRM_Core_Form {
     // auto-rendered in the loop -- such as "qfKey" and "buttons".  These
     // items don't have labels.  We'll identify renderable by filtering on
     // the 'label'.
-    $elementNames = array();
+    $elementNames = [];
     foreach ($this->_elements as $element) {
       /** @var HTML_QuickForm_Element $element */
       $label = $element->getLabel();
